@@ -1,0 +1,40 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Sync dependencies with uv
+        run: uv sync
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov . --cov-fail-under=80
+
+      # - name: Upload coverage to GitHub summary
+      #   run: |
+      #     coverage report >> $GITHUB_STEP_SUMMARY
+
+      # - name: Upload coverage artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: coverage-report
+      #     path: coverage.xml
